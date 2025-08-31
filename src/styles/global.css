@@ -1,0 +1,18 @@
+:root {
+  --color-primario: #1976d2;
+  --color-secundario: #43a047;
+  --color-fondo: #f4f8fb;
+  --color-neutro: #263238;
+  --color-exito: #388e3c;
+  --color-error: #f44336;
+  --fuente-primary: 'Montserrat', Arial, sans-serif;
+}
+body {
+  background: var(--color-fondo);
+  color: var(--color-neutro);
+  font-family: var(--fuente-primary);
+}
+a, .btn-primary {
+  background: var(--color-primario);
+  color: #fff;
+}
