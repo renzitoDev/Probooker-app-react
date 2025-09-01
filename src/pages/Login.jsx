@@ -7,7 +7,7 @@ export default function Login() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // Limpiar error al editar
+    setError("");
   };
 
   const handleLogin = async (e) => {
@@ -18,18 +18,33 @@ export default function Login() {
       const resp = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
+        body: JSON.stringify(form),
       });
       const data = await resp.json();
       if (data.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("tipo_usuario", data.tipo);
+        localStorage.setItem("tipo_usuario", data.tipo_usuario);
         localStorage.setItem("nombre", data.nombre);
-        setMensaje("¡Inicio de sesión correcto!");
-        // Redirige según tipo de usuario
-        // window.location.href = data.tipo === "profesional" ? "/dashboard" : "/"; // si tienes rutas privadas
+        localStorage.setItem("id_usuario", data.id_usuario);
+
+        // Guarda el identificador correspondiente
+        if (data.id_profesional)
+          localStorage.setItem("id_profesional", data.id_profesional);
+        else localStorage.removeItem("id_profesional");
+
+        if (data.id_cliente)
+          localStorage.setItem("id_cliente", data.id_cliente);
+        else localStorage.removeItem("id_cliente");
+
+        setMensaje(`¡Bienvenido, ${data.nombre}!`);
+        // Redirección según tipo de usuario (ajusta a tu estructura)
+        setTimeout(() => {
+          if (data.tipo_usuario === "profesional")
+            window.location.href = "/servicios-profesional";
+          else window.location.href = "/";
+        }, 1200);
       } else {
-        setError(data.error || "Datos incorrectos");
+        setError(data.error || "Usuario o contraseña incorrecta.");
       }
     } catch {
       setError("Error de servidor.");
