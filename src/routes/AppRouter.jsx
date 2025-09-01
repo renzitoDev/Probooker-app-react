@@ -5,6 +5,7 @@ import RegistroProfesional from "../pages/RegistroProfesional";
 import Login from "../pages/Login"
 import RegistroCliente from "../pages/RegistroCliente";
 import PerfilProfesionalPublico from "../pages/PerfilProfesionalPublico";
+import ReservaCita from "../pages/ReservaCita";
 
 export default function AppRouter() {
   return (
@@ -15,6 +16,7 @@ export default function AppRouter() {
         <Route path="/login" element={<Login />} />
         <Route path="/registro-cliente" element={<RegistroCliente />} />
         <Route path="/perfil/:nombre_unico" element={<PerfilProfesionalPublico />} />
+        <Route path="/reservar/:idServicio" element={<ReservaCita />} />
         {/* Agrega aquí más rutas a futuro */}
         <Route path="*" element={<h1>404 No encontrado</h1>} />
       </Routes>
