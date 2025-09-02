@@ -21,13 +21,16 @@ export default function Login() {
         body: JSON.stringify(form),
       });
       const data = await resp.json();
+      console.log("Respuesta del backend:", data);
+
       if (data.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("tipo_usuario", data.tipo_usuario);
         localStorage.setItem("nombre", data.nombre);
         localStorage.setItem("id_usuario", data.id_usuario);
-
+        console.log(data);
         // Guarda el identificador correspondiente
+        console.log(data.id_profesional);
         if (data.id_profesional)
           localStorage.setItem("id_profesional", data.id_profesional);
         else localStorage.removeItem("id_profesional");
@@ -37,10 +40,16 @@ export default function Login() {
         else localStorage.removeItem("id_cliente");
 
         setMensaje(`¡Bienvenido, ${data.nombre}!`);
+        console.log(
+        "tipo_usuario:", localStorage.getItem("tipo_usuario"),
+        "id_profesional:", localStorage.getItem("id_profesional"),
+        "token:", localStorage.getItem("token")
+      );
+
         // Redirección según tipo de usuario (ajusta a tu estructura)
         setTimeout(() => {
-          if (data.tipo_usuario === "profesional")
-            window.location.href = "/servicios-profesional";
+          if (data.tipo_usuario === "profesional" && data.id_profesional)
+            window.location.href = `/perfil-profesional/${data.id_profesional}`;
           else window.location.href = "/";
         }, 1200);
       } else {

@@ -7,6 +7,7 @@ import RegistroCliente from "../pages/RegistroCliente";
 import PerfilProfesionalPublico from "../pages/PerfilProfesionalPublico";
 import ReservaCita from "../pages/ReservaCita";
 import ServiciosProfesional from "../pages/ServiciosProfesional";
+import PerfilProfesional from "../pages/PerfilProfesional";
 
 export default function AppRouter() {
   return (
@@ -19,6 +20,7 @@ export default function AppRouter() {
         <Route path="/perfil/:nombre_unico" element={<PerfilProfesionalPublico />} />
         <Route path="/reservar/:idServicio" element={<ReservaCita />} />
         <Route path="/servicios-profesional" element={<ServiciosProfesional />} />
+        <Route path="/perfil-profesional/:id_profesional" element={<PerfilProfesional />} />
         {/* Agrega aquí más rutas a futuro */}
         <Route path="*" element={<h1>404 No encontrado</h1>} />
       </Routes>
