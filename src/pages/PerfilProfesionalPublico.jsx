@@ -9,6 +9,8 @@ import SnackbarGlobal from "../components/SnackbarGlobal";
 
 
 export default function PerfilProfesionalPublico() {
+  const { url_personalizada } = useParams();
+  const [datosProfesional, setDatosProfesional] = useState(null);
   const { nombre_unico } = useParams(); // Suponiendo ruta tipo /perfil/:nombre_unico
   const navigate = useNavigate();
   const [pro, setPro] = useState(null);
