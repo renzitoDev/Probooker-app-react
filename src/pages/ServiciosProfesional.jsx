@@ -5,8 +5,12 @@ import {
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SnackbarGlobal from "../components/SnackbarGlobal";
+
 
 const modalidades = ["presencial", "virtual"];
+
+
 
 export default function ServiciosProfesional() {
   // Puedes obtener el id_profesional de localStorage o prop/context tras login
@@ -17,6 +21,12 @@ export default function ServiciosProfesional() {
   const [form, setForm] = useState({
     nombre_servicio: "", descripcion: "", precio: "", modalidad: "", duracion_minutos: ""
   });
+
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const showSnackbar = (message, severity = "success") => {
+  setSnackbar({ open: true, message, severity });
+  };
+
 
   // Fetch servicios al montar
   useEffect(() => {
@@ -46,31 +56,48 @@ export default function ServiciosProfesional() {
 
   const handleSave = async () => {
     if (!form.nombre_servicio || !form.precio || !form.modalidad)
-      return alert("Completa los campos obligatorios");
-
-    if (editando) {
-      // Editar
-      await fetch(`http://localhost:4000/api/servicios/editar/${editando}`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(form)
-      });
-    } else {
-      // Crear
-      await fetch('http://localhost:4000/api/servicios/crear', {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ ...form, id_profesional })
-      });
+      return showSnackbar("Completa los campos obligatorios", "error");
+    try {
+      if (editando) {
+        // Editar
+        const resp = await fetch(`http://localhost:4000/api/servicios/editar/${editando}`, {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(form)
+        });
+        const data = await resp.json();
+        if (data.ok) showSnackbar("Servicio editado correctamente");
+        else showSnackbar("Error al editar servicio", "error");
+      } else {
+        // Crear
+        const resp = await fetch('http://localhost:4000/api/servicios/crear', {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ ...form, id_profesional })
+        });
+        const data = await resp.json();
+        if (data.ok) showSnackbar("¡Servicio creado exitosamente!");
+        else showSnackbar("No se pudo crear el servicio", "error");
+      }
+      cargarServicios();
+      handleClose();
+    } catch {
+      showSnackbar("Error de red", "error");
     }
-    cargarServicios();
-    handleClose();
   };
+
 
   const handleDelete = async (id_servicio) => {
     if (!window.confirm("¿Seguro de eliminar este servicio?")) return;
-    await fetch(`http://localhost:4000/api/servicios/eliminar/${id_servicio}`, { method: "DELETE" });
-    cargarServicios();
+    try {
+      const resp = await fetch(`http://localhost:4000/api/servicios/eliminar/${id_servicio}`, { method: "DELETE" });
+      const data = await resp.json();
+      if (data.ok) showSnackbar("Servicio eliminado correctamente");
+      else showSnackbar("Error al eliminar", "error");
+      cargarServicios();
+    } catch {
+      showSnackbar("Error de red", "error");
+    }
   };
 
   return (
@@ -128,6 +155,12 @@ export default function ServiciosProfesional() {
           <Button variant="contained" onClick={handleSave}>{editando ? "Actualizar" : "Crear"}</Button>
         </DialogActions>
       </Dialog>
+      <SnackbarGlobal
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      />
     </Box>
   );
 }

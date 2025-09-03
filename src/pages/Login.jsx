@@ -1,19 +1,20 @@
 import React, { useState } from "react";
+import SnackbarGlobal from "../components/SnackbarGlobal";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-  const [mensaje, setMensaje] = useState("");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError("");
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setMensaje("");
     try {
       const resp = await fetch("http://localhost:4000/api/auth/login", {
         method: "POST",
@@ -21,16 +22,11 @@ export default function Login() {
         body: JSON.stringify(form),
       });
       const data = await resp.json();
-      console.log("Respuesta del backend:", data);
-
       if (data.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("tipo_usuario", data.tipo_usuario);
         localStorage.setItem("nombre", data.nombre);
         localStorage.setItem("id_usuario", data.id_usuario);
-        console.log(data);
-        // Guarda el identificador correspondiente
-        console.log(data.id_profesional);
         if (data.id_profesional)
           localStorage.setItem("id_profesional", data.id_profesional);
         else localStorage.removeItem("id_profesional");
@@ -39,24 +35,17 @@ export default function Login() {
           localStorage.setItem("id_cliente", data.id_cliente);
         else localStorage.removeItem("id_cliente");
 
-        setMensaje(`¡Bienvenido, ${data.nombre}!`);
-        console.log(
-        "tipo_usuario:", localStorage.getItem("tipo_usuario"),
-        "id_profesional:", localStorage.getItem("id_profesional"),
-        "token:", localStorage.getItem("token")
-      );
-
-        // Redirección según tipo de usuario (ajusta a tu estructura)
+        showSnackbar(`¡Bienvenido, ${data.nombre}!`, "success");
         setTimeout(() => {
-          if (data.tipo_usuario === "profesional" && data.id_profesional)
+          if (data.tipo_usuario === "profesional")
             window.location.href = `/perfil-profesional/${data.id_profesional}`;
           else window.location.href = "/";
         }, 1200);
       } else {
-        setError(data.error || "Usuario o contraseña incorrecta.");
+        showSnackbar(data.error || "Usuario o contraseña incorrectos.", "error");
       }
     } catch {
-      setError("Error de servidor.");
+      showSnackbar("Error de servidor.", "error");
     }
   };
 
@@ -86,12 +75,16 @@ export default function Login() {
             style={{ width: "100%", padding: 8, borderRadius: 4, border: "1px solid #ddd" }}
           />
         </div>
-        <button className="btn-primary" style={{ width: "100%", padding: 12, borderRadius: 4, border: 0 }}>
+        <button style={{ width: "100%", padding: 12, borderRadius: 4, border: 0, background: "#1976d2", color: "#fff" }}>
           Iniciar Sesión
         </button>
-        {error && <div style={{ color: "#f44336", marginTop: 16 }}>{error}</div>}
-        {mensaje && <div style={{ color: "#388e3c", marginTop: 16 }}>{mensaje}</div>}
       </form>
+      <SnackbarGlobal
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      />
     </div>
   );
 }

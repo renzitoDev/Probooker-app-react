@@ -8,6 +8,8 @@ import PerfilProfesionalPublico from "../pages/PerfilProfesionalPublico";
 import ReservaCita from "../pages/ReservaCita";
 import ServiciosProfesional from "../pages/ServiciosProfesional";
 import PerfilProfesional from "../pages/PerfilProfesional";
+import PrivateRoute from "../components/PrivateRoute";
+import PanelCitasProfesional from "../pages/PanelCitasProfesional";
 
 export default function AppRouter() {
   return (
@@ -19,8 +21,42 @@ export default function AppRouter() {
         <Route path="/registro-cliente" element={<RegistroCliente />} />
         <Route path="/perfil/:nombre_unico" element={<PerfilProfesionalPublico />} />
         <Route path="/reservar/:idServicio" element={<ReservaCita />} />
-        <Route path="/servicios-profesional" element={<ServiciosProfesional />} />
-        <Route path="/perfil-profesional/:id_profesional" element={<PerfilProfesional />} />
+        
+        
+        <Route
+          path="/perfil-profesional/:id_profesional"
+          element={
+            <PrivateRoute tipo="profesional">
+              <PerfilProfesional />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+            path="/servicios-profesional"
+            element={
+              <PrivateRoute tipo="profesional">
+                <ServiciosProfesional />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/perfil-profesional/:id_profesional"
+            element={
+              <PrivateRoute tipo="profesional">
+                <PerfilProfesional />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/panel-citas"
+            element={
+              <PrivateRoute tipo="profesional">
+                <PanelCitasProfesional />
+              </PrivateRoute>
+            }
+          />
         {/* Agrega aquí más rutas a futuro */}
         <Route path="*" element={<h1>404 No encontrado</h1>} />
       </Routes>

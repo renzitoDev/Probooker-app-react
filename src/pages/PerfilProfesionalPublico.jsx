@@ -4,6 +4,9 @@ import {
   Button, Avatar, Grid, Divider
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
+import SnackbarGlobal from "../components/SnackbarGlobal";
+
+
 
 export default function PerfilProfesionalPublico() {
   const { nombre_unico } = useParams(); // Suponiendo ruta tipo /perfil/:nombre_unico
