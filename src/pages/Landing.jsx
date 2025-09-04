@@ -1,12 +1,42 @@
-import React from "react";
-import { AppBar, Toolbar, Button, Box, Typography, Stack, Grid, Card, CardContent } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import Slider from "react-slick";
+import { AppBar, Toolbar, Button, Box, Typography, Stack, Grid, Card, CardContent,CardMedia } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import LogoProbooker from "../components/LogoProbooker";
 // Puedes cambiar la imagen por una tuya en assets si prefieres local:
 import ilustracion from "../assets/landing-hero.svg";
 
 export default function Landing() {
-  const navigate = useNavigate();
+   const [profesionales, setProfesionales] = useState([]);
+   const navigate = useNavigate();
+
+    useEffect(() => {
+      // Obtener profesionales y quedarnos con 6 random para el slider:
+      fetch("http://localhost:4000/api/profesionales")
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok) {
+            // Mezcla y toma 6 random; si tienes campo destacado, filtra primero por eso:
+            const mezclados = [...data.profesionales].sort(() => 0.5 - Math.random());
+            setProfesionales(mezclados.slice(0, 6));
+          }
+        });
+    }, []);
+
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: Math.min(3, profesionales.length),
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3500,
+        responsive: [
+          { breakpoint: 900, settings: { slidesToShow: 2 } },
+          { breakpoint: 600, settings: { slidesToShow: 1 } },
+        ],
+      };
+        
 
   return (
     <Box>
@@ -91,6 +121,65 @@ export default function Landing() {
           </Grid>
         </Grid>
       </Box>
+      {/* SLIDER PROFESIONALES DESTACADOS */}
+      <Box sx={{ mt: 6, mb: 2 }}>
+        <Typography variant="h5" align="center" sx={{ mb: 4, fontWeight: 600, color: "primary.main" }}>
+          Profesionales destacados esta semana
+        </Typography>
+        <Slider {...settings}>
+          {profesionales.map(p => (
+            <Box key={p.id_profesional} px={2}>
+              <Card sx={{ maxWidth: 320, m: "auto", cursor: "pointer" }} onClick={() => navigate(`/perfil/${p.url_personalizada}`)}>
+                <CardMedia
+                  component="img"
+                  image={p.foto_url || "/default-avatar.png"}
+                  sx={{ height: 160, objectFit: "cover", background: "#eaeaea" }}
+                  alt={p.nombre}
+                />
+                <CardContent>
+                  <Typography variant="h6" color="primary" gutterBottom>
+                    {p.nombre} {p.apellidos}
+                  </Typography>
+                  <Typography variant="body2">{p.ciudad}</Typography>
+                  <Typography variant="body2" sx={{ mt: 1, opacity: 0.7 }}>
+                    {p.descripcion?.slice(0, 60) || "-"}
+                  </Typography>
+                  <Button sx={{ mt: 1 }} variant="outlined" size="small" fullWidth>
+                    Ver perfil
+                  </Button>
+                </CardContent>
+              </Card>
+            </Box>
+          ))}
+        </Slider>
+      </Box>
+
+      <Box sx={{ mt: 7, mb: 4, maxWidth: 900, mx: "auto" }}>
+        <Typography variant="h5" align="center" sx={{ mb: 3, fontWeight: 600, color: "secondary.main" }}>
+          Lo que opinan nuestros usuarios
+        </Typography>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} md={4}>
+            <Card sx={{ p: 2 }}>
+              <Typography variant="body1">“Gracias a ProBooker conseguí clientes en mi zona al instante, ¡es súper fácil!”</Typography>
+              <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 700 }}>Juan (Entrenador)</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ p: 2 }}>
+              <Typography variant="body1">“La agenda y las alertas son lo mejor. Ahora mis pacientes reservan y cancelan online.”</Typography>
+              <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 700 }}>Renzo (Nutriólogo)</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ p: 2 }}>
+              <Typography variant="body1">“Encontré una masajista genial. Reservar fue simple y confiable, 100% recomendado.”</Typography>
+              <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 700 }}>Carla (Cliente)</Typography>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+
     </Box>
   );
 }
